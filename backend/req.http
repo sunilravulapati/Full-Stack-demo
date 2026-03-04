@@ -1,0 +1,22 @@
+###User Creation
+POST http://localhost:5000/user-api/users
+Content-Type: application/json
+
+{
+    "name":"sid",
+    "email":"sid123@mail.com",
+    "dob":"2005-05-05",
+    "mobile":98765453281
+}
+
+###read all users
+GET http://localhost:5000/user-api/users
+
+###read user by id
+GET http://localhost:5000/user-api/users/69a68080b80a800cdfde5784
+
+### soft delete
+DELETE http://localhost:5000/user-api/users/69a68080b80a800cdfde5784
+
+### activate the user
+PATCH http://localhost:5000/user-api/users/69a68080b80a800cdfde5784

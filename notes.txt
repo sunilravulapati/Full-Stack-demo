@@ -1,0 +1,7 @@
+11000 - related to unique key error, mainly due to mongoose, though in rest the code is 409
+
+PUT AND PATCH:
+    put - complete change in the resource
+    patch - when partial changes are required
+
+CORS - cross origin resource sharing
