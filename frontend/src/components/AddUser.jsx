@@ -44,7 +44,7 @@ function AddUser() {
   }
 
   return (
-    <div className="flex justify-center items-center py-10 bg-gray-50 min-h-[400px] rounded-2xl">
+    <div className="flex justify-center items-center py-10 bg-gray-50 min-h-100 rounded-2xl">
       <div className="w-full max-w-md bg-white p-8 rounded-2xl shadow-xl border border-gray-100">
         <h2 className="text-3xl font-extrabold text-gray-800 text-center mb-8 tracking-tight">
           Add New User

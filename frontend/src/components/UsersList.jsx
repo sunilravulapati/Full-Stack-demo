@@ -39,7 +39,7 @@ function UsersList() {
     return <p className='text-3xl text-center mt-10 text-orange-500'>Loading.....</p>
   }
   if (error) {
-    return <p className='text-3xl text-center mt-10 text-red-500'>Error occurred.....</p>
+    return <p className='text-3xl text-center mt-10 text-red-500'>Error occurred.....backend is not deployed yet!</p>
   }
   return (
     <div>
