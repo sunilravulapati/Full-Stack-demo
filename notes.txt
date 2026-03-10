@@ -5,3 +5,563 @@ PUT AND PATCH:
     patch - when partial changes are required
 
 CORS - cross origin resource sharing
+
+operations like filter,map,reduce create a new array-can be used for State
+operations like pop,push,splice,shift,unshift mutate the existing array - avoid using them
+
+for parameterised functions call them by a call back
+    onClick={()=>function(parameter)}
+
+
+delete:
+const delMark=(index)=>{
+    setMarks(marks.filter((_,i)=>i!==index))
+}
+
+Object.keys(),Object.values(),Object.entries() - they return an array of keys and values
+
+
+Form Handling in React
+in forms the button is of type='submit' which generates onSubmit on the whole form
+->react has the ability to handle form and do validation, but it is very verbose and time-consuming
+    react hook / formic
+
+REACT HOOK FORM - designed to validate and submit form in react
+install: npm i react-hook-form
+import {useForm} from 'react-hook-form'
+call the function: useForm() : this returns an object
+    const {register,handleSubmit} = useForm()
+
+-> in input element the name will act as the key as we are going to return an object
+->register every element to the useForm hook
+    register function will take the name of the input element - name attribute is not required
+
+    <input type = "text" {...register("username")} placeholder="username" id="un"/>
+
+to submit a form create a function
+    const submitForm=(o)=>{
+        clg(o)
+    }
+
+User Validation
+it is recommended to validate the users even in the frontend though we have designed a backend which validates the user
+->burden on the backend
+=>hackers can bypass all the validation rules so we need to have a backend validation as well
+=>whenever we create a unique then indexes are created!
+-> to make like this where we can receive a response like this field is mandatory we use the formState
+
+Conditional rendering
+ternary operator: condition ? react-el1 : react-el2=>similar to if else
+other way: condition && react-el1=> similar to if
+
+->during development mode, when the component is pure it will be rendered normally
+    this is due to StrictMode in main.jsx and will be rendered twice
+->in react there is only a relation b/w parent - child but no child - child 
+    for that lifting state up
+
+Lifting State Up
+
+->problems:
+    time taking
+    sometimes the parent that has received the state which is not the one who should receive this should pass it on and that logic should be written
+    if there are more than one level this becomes a bit inefficient
+->if single level - lifting state up else use redux
+
+#render - means prepare to display
+#fetch function is used to get api calls
+#usually rendering is like batch processing
+
+SIDE-EFFECTS
+external api calls, accessing/interacting with the dom(outside of react as react uses virtual dom)
+-> a component can render initially before displaying the content.
+-> if the component is about to make an api request it should wait until the initial rendering is completed
+-> only after the initial rendering should the component make an api request. if this happens together, it leads to unexpected bugs in the application
+We need to allow the component to make the initial rendering and then later only should api requests must be made
+
+useEffect - used to manage / handle the side effects
+useEffect(()=>{//effect function-outer functions},[//dependency function-optional])
+1. if there is no dependency array - useEffect(()=>{//effect function-outer functions})
+    this will run after every render
+2. if the dependency array is empty - useEffect(()=>{//effect function-outer functions},[])
+    this will only run after first initial render
+3. if there are dependencies - useEffect(()=>{//effect function-outer functions},[dependencies(states ex:counter or something else)-can be multiple])
+    this will run after every dependency change
+
+->disable the strict mode as it will render the component twice.......this is done so that to check if there are any errors.....during development we should disable it so that we get to know 
+correctly how many times the component should render.
+
+2/3/26
+ROUTING
+->before we start the routing.....we should decide the root layout
+=>root component : App.jsx and root layout is the layout which we want
+=>react doesnt have internal routing application, for that we have an external one react router
+    npm i react-router(before v7), npm i react-router-dom(before v7)
+    npm i react-router(in v7 both of them are combined)
+->since the main layout is going to be the placeholder for the components in the header/nav bar use the Outlet from react-router to make the main section as the placeholder
+->then create the components you want
+->configure the routing for the above created components - connecting the components to its parent/parents with a path
+    use the root component to do routing
+    there is a module named createBrowserRouter from 'react-router' which creates the routing
+        const routingObj = createBrowserRouter() //this creates and returns an routingObj object
+        then use the RouterProvider component which takes the value router = {routingObj}
+=>whenever the application starts we must load the rootLayout then the home should load
+    every routingObj contains two properties: path and element
+        const routingObj = createBrowserRouter([{
+            path:"/",
+            element:<RootLayout/>,
+            children:[
+                {
+                path:"/",
+                element:<Home/>
+                },
+                {
+                path:"register",
+                element:<Register/>
+                },
+                {
+                path:"login",
+                element:<Login/>
+                },
+                {
+                path:"tech",
+                element:<Tech/>
+                }
+            ]
+        }])
+
+-> use NavLink from react-router 
+    because with anchor tag the entire page will refresh , it automatically creates an hyperlink , it dynamically adds an active class to it
+    <NavLink to=""></NavLink>
+->          {
+              path:"",
+              element: <Navigate to="java"/>
+            }
+    with this we can decide what we want to load - it can solve the white page issue
+    import Navigate from the react-router
+
+->at each component level we must use Outlet so that whatever children there are, their content will be displayed
+
+=>        <li><NavLink to="/" className={({ isActive }) => isActive ? "text-white" : "text-black"}>Home</NavLink></li>
+            this makes sure that it is clear for the users that they are in this particular component like head, productslist or contact us page
+
+->PROGRAMATIC NAVIGATION | MANUAL NAVIGATION
+To implement we have to import a special useNavigate hook which is a function that helps us to navigate, it returns a function, we must porvide the path to this
+const navigate = useNavigate()
+
+  // navigate to product component
+  const gotoProduct=()=>{
+    navigate('/products')
+  }
+
+  then use onclick function and call this function if the funciton is parameterised then call it directly by its name, else use a call back function and call it
+
+
+  // navigate to product component
+  const gotoProduct=(productObj)=>{
+    // navigation logic
+    // while navigating, transfer the product object as well
+    navigate('/products',{state:{product:productObj}})
+  }           path         state object which has key as product and its value is the product object
+
+useLocation() //in react-router: when a component is loaded it will check what was the last component that was used. example: location object in windows
+        ->it knows who has sent the data and we can easily use it
+        const {state} = useLocation()
+        // console.log(state?.product)
+
+//productlist.jsx
+import { useEffect, useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { useNavigate } from 'react-router'
+
+function ProductsList() {
+  const { register, handleSubmit } = useForm();
+
+  let [products, setProducts] = useState([])
+  let [loading, setLoading] = useState(false)
+  let [error, setError] = useState(null)
+  let [filteredProductData, setFilteredProductData] = useState([]) //searched products data - could be either by title or by category
+  const navigate = useNavigate()
+
+  // navigate to product component
+  const gotoProduct = (productObj) => {
+    // navigation logic
+    // while navigating, transfer the product object as well
+    navigate('/products', { state: { product: productObj } })
+  }
+
+  useEffect(() => {
+    setLoading(true)
+    async function getProducts() {
+      try {
+        let res = await fetch('https://fakestoreapi.com/products')
+        if (res.status === 200) {
+          // extract the json data from the response
+          let productsData = await res.json()
+          // update the state
+          setProducts(productsData)
+          setFilteredProductData(productsData)
+        }
+        else {
+          throw new Error('failed to fetch the products data')
+        }
+      } catch (err) {
+        setError(err.message)
+      }
+      finally {
+        setLoading(false)
+      }
+    }
+    getProducts()
+  }, [])
+
+  if (loading === true) {
+    return <p className='text-center text-2xl text-blue-300'>Loading.....</p>
+  }
+  if (error !== null) {
+    return <p className='text-center text-2xl text-red-500'>Error: {error}</p>
+  }
+
+  // const searchProductByTitle = (formDataObj) => {
+  //   // get the input field data
+  //   let searchTerm = formDataObj.searchInput.toLowerCase();
+  //   // if it is empty then set the products to display all the products
+  //   if (searchTerm.trim() === '') {
+  //     setFilteredProductData(products)
+  //     return
+  //   }
+  //   // console.log(searchTerm)
+  //   // filter by title
+  //   let filtered = products.filter((productObj) => productObj.title.toLowerCase().includes(searchTerm))
+  //   // set the filtered data
+  //   setFilteredProductData(filtered)
+  // }
+
+  // const searchProductByCategory = (formDataObj) => {
+  //   // get the input field data
+  //   let searchTerm = formDataObj.searchInput.toLowerCase();
+  //   // if it is empty then set the products to display all the products
+  //   if (searchTerm.trim() === '') {
+  //     setFilteredProductData(products)
+  //     return
+  //   }
+  //   // filter by category
+  //   let filtered = products.filter((productObj) => productObj.category.toLowerCase() === searchTerm)
+  //   // set the filtered data
+  //   setFilteredProductData(filtered)
+  // }
+
+  // combined function
+  const searchProduct = (formDataObj) => {
+    // get the input field data
+    let searchTerm = formDataObj.searchInput.toLowerCase();
+    // if it is empty then set the products to display all the products
+    if (searchTerm.trim() === '') {
+      setFilteredProductData(products)
+      return
+    }
+    // filter by category
+    let filtered = products.filter((productObj) =>
+      productObj.title.toLowerCase().includes(searchTerm) ||
+      productObj.category.toLowerCase() === searchTerm //includes() checks for substring match, not exact match. dont use it for category
+    )
+    // set the filtered data
+    setFilteredProductData(filtered)
+  }
+
+  //sort by price
+  const filterByPrice = (dropDown) => {
+    // create a copy of the filteredProducts and do operations on that
+    let copy = [...filteredProductData]
+    // check the dropdown by the option id
+    if (dropDown === 'low') {
+      // ascending order lesser - larger
+      copy.sort((a, b) => a.price - b.price) //sorts the array in place, returns either -neg,positive or zero
+    }
+    else if (dropDown === 'high') {
+      // descending order larger - lesser
+      copy.sort((a, b) => b.price - a.price)
+    }
+    setFilteredProductData(copy)
+  }
+  return (
+    <div>
+      {/* search by product category */}
+      {/* search form field with a placeholder and a button */}
+      {/* once the use clicks the button then implement a filter function to filter out by category and return the result */}
+      <div className="flex justify-center items-center">
+        <form
+          onSubmit={handleSubmit(searchProduct)}
+          className="flex gap-3 mt-10"
+        >
+          <input
+            type="text"
+            placeholder="enter the product category/title"
+            {...register('searchInput')}
+            className="border rounded px-3 py-2"
+          />
+          <button type="submit" className="border rounded bg-gray-300 px-4 py-2">Search 🔎</button>
+          <select onChange={(e) => filterByPrice(e.target.value)} className="border rounded bg-gray-200 px-3 py-2">
+            <option value="">Select</option>
+            <option value="low">Low to High</option>
+            <option value="high">High to Low</option>
+          </select>
+        </form>
+      </div>
+
+      <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-12 mt-10'>
+        {/* products list */}
+        {
+          filteredProductData.length === 0 ? (
+            <p className='text-red-500 text-center'>
+              No product found!
+            </p>
+          ) : (
+            filteredProductData.map((productObj) => (
+              <div
+                onClick={() => gotoProduct(productObj)}
+                key={productObj.id}
+                className='shadow-md rounded-3xl p-10 text-center cursor-pointer bg-gray-100'
+              >
+                <img
+                  className="h-40 object-contain block mx-auto mb-10"
+                  src={productObj.image}
+                  alt={productObj.title}
+                />
+                <h2>{productObj.title}</h2>
+                <p className='text-green-400'>${productObj.price}</p>
+              </div>
+            ))
+          )
+        }
+      </div>
+    </div>
+  )
+}
+
+export default ProductsList
+
+
+// sortByPrice:
+// JavaScript's .sort() method rearranges elements of an array.
+// It expects a comparison function that returns:
+//   - negative value → a comes before b
+//   - positive value → b comes before a
+//   - 0              → keep order unchanged
+//
+// Since price is numeric, we use subtraction:
+//   a.price - b.price  → ascending
+//   b.price - a.price  → descending
+//
+// Important: .sort() mutates the original array,
+// so we create a copy using [...filteredProductData]
+// before sorting to avoid mutating React state.
+
+TailwindCSS intellisense
+-> npm i tailwindcss @tailwindcss/vite
+-> in vite.config.js:
+    import { defineConfig } from 'vite'
+    import react from '@vitejs/plugin-react'
+    import tailwindcss from '@tailwindcss/vite'
+
+    // https://vite.dev/config/
+    export default defineConfig({
+      plugins: [react(), tailwindcss()],
+    })
+-> in index.css: @import 'tailwindcss';
+->close vscode and then open it again
+
+STATE MANAGEMENT
+lets say there are 20 components all of them depending on state 'x' if the x is changed then the change needs to be broadcasted to all the components of the application
+=>lifting state up / prop-drilling good for only single level one
+->it means sharing the state across the application and achieve sync in state across the application
+=>context api (solves the prop drilling) - small / medium applications
+    we create a separate place named context provider and store the state(it exists outside the component tree) and the components will hence becomes context consumers
+    now the components can directly take the state from the context provider
+3/3/26
+  STEPS
+  ->create a context object
+  ->immediately react will provide: context provider(used to provide state through context object) and context consumer(components consume the state through context object)
+  ->a component can consume the state of context provider with useContext hook
+
+=>create a folder in the src named 'contexts'(everything related to context must be placed in this folder) and then create a js file named 'CounterContext.js'
+//create a context object
+    import {createContext} from 'react'
+    export const CounterContext = createContext() //context is like a channel,it does not have any state by its own, it just passes the state
+//then create a 'CounterContextProvider.jsx' in the same folder
+    import {useState} from 'react'
+    import {CounterContext} from './CounterContext'
+
+    function CounterContextProvider({children}){
+      //state
+      const [counter1,setCounter1] = useState(1)
+      //function to modify state
+      const changeState=()=>{
+        setCounter1(counter1+1)
+      }
+      //return
+      return (
+        <CounterContext.Provider value={{counter1,changeState}}>
+          {children}
+        </CounterContext.Provider>
+      )
+    }
+=>wrap the root component with the CounterContextProvider, the root component(App is in main.jsx)
+import { StrictMode } from 'react'
+import { createRoot } from 'react-dom/client'
+import './index.css'
+import App from './App.jsx'
+import CounterContextProvider from './contexts/CounterContextProvider.jsx'
+
+createRoot(document.getElementById('root')).render(
+    {/* wrap root component with provider */}
+    <CounterContextProvider>
+      <App />
+    </CounterContextProvider>
+)
+
+=>every components can consume the state from the context provider by using useContext hook and context object
+
+import {useContext} from 'react'
+import { CounterContext } from '../contexts/CounterContext'
+function A() {
+  //state
+  let {counter1,changeState} = useContext(CounterContext)
+  console.log("component A rendered")
+  return (
+    <div className='bg-amber-200 shadow-md text-center'>
+      <p className='p-10'>Component A</p>
+      <p>Counter1: {counter1}</p>
+      <button onClick={changeState}>Click me</button> {/* now whatever component have done any change to the state then those changes will be broadcasted to all the currently connectly components */}
+    </div>
+  )
+}
+
+export default A
+
+when we check the console after clicking the submit then all the state connected components will render
+->react considers that even whatever is changed that is an object, so even if any component doesnt use all the counter facilities it will be rendered.
+->solution to this is 
+
+IMPORTANT: keep only one state in one context, otherwise it will lead to unnecessary rendering which affects the performance,
+            solutions: create a new context for new states, else use redux or zus-stand
+
+=>redux / zus-stand () - high level applications
+
+9/3/26
+ZUS-STAND
+Advanced state management tools: redux(lot of boilerplate code) and zustand(simple to learn),though both of them are quite same
+
+zustand
+->we are going to create a global store and in that we are going to add the state which is needed by the components(dont keep the states that are not required)
+->if the state is modified by one of the components then the change is broadcasted to all the components that use this state
+
+STEPS:
+1. install zustand : npm i zustand
+2. create a global store, in src create a folder named 'store'
+3. inside that folder create a file with a meaning-full name
+4. import {create} from 'zustand'
+    //create store
+    export const useTest = create((set)=>()) //this creates a custom hook
+    #create(()=>({})) // we have to return an object
+    difference between ()=>{} and ()=>({}) is that the first one is the definition of the function but the second one is going to return us an object
+
+    create((set)=>({
+      //state
+      x:10,
+      //function to modify that state
+      incrementX:()=>set(state=>({x:state.x+1}))
+    }))
+
+    dont directly call the useTest hook, always extract the state that you want individually
+    if there are multiple states, then with zustand extract the states that are needed by the components then whenever changes to those states are done then other components that didnt need a particular state wont be rendered!
+
+    we can also pass external values to the store
+    incrementXByValue: (val) => set(state => ({ x: state.x + val })),
+
+    TestStore.js
+    import { create } from 'zustand'
+    //create store
+    export const useTest = create((set) => ({
+        //state
+        x: 10,
+        y: 20,
+        user:{
+            name:"Vikas",
+            age:21
+        },
+        //function to modify that state
+        incrementX: () => set(state => ({ x: state.x + 1 })),
+        decrementX: () => set(state => ({ x: state.x - 1 })),
+        incrementY: () => set(state => ({ y: state.y + 1 })),
+        incrementXByValue: (val) => set(state => ({ x: state.x + val })),
+        updateUser: (newName) => set(state=>({user:{...state,name:newName,age:19}}))
+    })) //this creates a custom hook
+
+#react uses virtual dom(a copy of the real dom is created and changes are done to that,stored in the memory) while angular uses incremental dom
+#for large scale applications use angular
+#component is the reusable piece which is just like a function, whenever the component is changed it is re-rendered(this is like function which is called multiple times)
+
+useRef Hook: use reference hook
+->this is used to access the reference of the real dom directly
+=>reason this is used: if some action needs to happen instantly(improve the user experience), if we want to maintain few previous values, sometimes when changes occur then the component should not render
+->ref is one of the attribute which can be used to connect the reference elements
+      <input ref={inputRef} type="text" />
+code:
+  let inputRef = useRef(null)
+  useEffect(()=>{
+    //side effect
+    inputRef.current.focus()
+  }, [])
+  <input type="text" ref={inputRef}/>
+
+#function in js are first class objects: can be stored in a variable(function expression), can be sent as an argument(callback),can return another function(least used)
+  reason: js supports both oop and functional oriented programming
+  ->function without any function name is an anonymous function
+  ->during the function execution the things that were defined they will stored in the memory(stack) and after the execution of function they are removed from the stack
+  ->sometimes the function can remember the previous values this is due to closure
+
+Closure in JS
+->function with its surrounding states is the closure, this is the default property in js
+->what happens is: whenever a function execution is done, the things in function(which returns another function), will be removed from the callstack and temporarily is stored in heaps(heaps usually store reference types) by the js engine.
+  ex:
+    function increment(){
+      let counter = 0;
+      return function(){
+        counter++;
+        return counter;
+      }
+    }
+    let x = increment() // this now becomes a function which returns the inner function
+    console.log(x()) // terminal: 1
+    //counter variable inside the increment function is local that function, whenever the inner function is executed it uses the counter variable
+
+REST PARAMETERS
+function sum(a,b){
+  return a+b
+}
+getSum(10,20,30,40) // in other languages this causes an error but in js what happens is that it just takes in the needed parameters and returns the result
+
+->two ways: pass the values as an single array, but we dont use this as it could spoil the user experience
+          other way is to make a rest parameter
+          function sum(...a){ // ...a is the rest parameter, this can receive any no. of arguments and packs them into an array
+            console.log(a) // output: [10,20,30,40]
+            return a.reduce((x,y)=>x+y)
+          }
+          getSum(10,20,30,40)
+          ->never place a normal parameter after the rest parameter, always the rest parameter must be placed at the end
+
+Controllers:
+whatever request handlers are there to an api route and we keep that in a normal variable, that is a Controller
+
+before:
+app.get(path,(req,res)=>{}) // api route
+
+after:
+const getUsers = (req,res)=>{} // controller
+app.get(path,getUsers) // api route
+
+#in some other applications
+app.routes.js
+ |    |     |
+file what  extension
+     is done  
